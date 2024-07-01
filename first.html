@@ -588,23 +588,33 @@ t6 = Uint8Array.from(t5);
     </script>
     <script>
       const assetIcons = {
-        ether: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"> <g clip-path="url(#clip0_201_2)"> <path d="M12 0L19.6368 12.4368L12.1633 16.8L4.36325 12.4368L12 0Z"/> <path d="M12 24L4.36325 13.6099L11.8367 18L19.6368 13.6099L12 24Z"/> </g> <defs> <clipPath id="clip0_201_2"> <rect width="24" height="24" fill="white"/> </clipPath> </defs> </svg>`,
+        sol: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="#000000">
+    <path d="M16 0c8.837 0 16 7.163 16 16s-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0zm8.706 19.517H10.34a.59.59 0 00-.415.17l-2.838 2.815a.291.291 0 00.207.498H21.66a.59.59 0 00.415-.17l2.838-2.816a.291.291 0 00-.207-.497zm-3.046-5.292H7.294l-.068.007a.291.291 0 00-.14.49l2.84 2.816.07.06c.1.07.22.11.344.11h14.366l.068-.007a.291.291 0 00.14-.49l-2.84-2.816-.07-.06a.59.59 0 00-.344-.11zM24.706 9H10.34a.59.59 0 00-.415.17l-2.838 2.816a.291.291 0 00.207.497H21.66a.59.59 0 00.415-.17l2.838-2.815A.291.291 0 0024.706 9z"/>
+</svg>
+`,
         usdc: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" data-name="86977684-12db-4850-8f30-233a7c267d11" viewBox="0 0 2000 2000"> <path d="M1000 2000c554.17 0 1000-445.83 1000-1000S1554.17 0 1000 0 0 445.83 0 1000s445.83 1000 1000 1000z" fill="#2775ca"/> <path d="M1275 1158.33c0-145.83-87.5-195.83-262.5-216.66-125-16.67-150-50-150-108.34s41.67-95.83 125-95.83c75 0 116.67 25 137.5 87.5 4.17 12.5 16.67 20.83 29.17 20.83h66.66c16.67 0 29.17-12.5 29.17-29.16v-4.17c-16.67-91.67-91.67-162.5-187.5-170.83v-100c0-16.67-12.5-29.17-33.33-33.34h-62.5c-16.67 0-29.17 12.5-33.34 33.34v95.83c-125 16.67-204.16 100-204.16 204.17 0 137.5 83.33 191.66 258.33 212.5 116.67 20.83 154.17 45.83 154.17 112.5s-58.34 112.5-137.5 112.5c-108.34 0-145.84-45.84-158.34-108.34-4.16-16.66-16.66-25-29.16-25h-70.84c-16.66 0-29.16 12.5-29.16 29.17v4.17c16.66 104.16 83.33 179.16 220.83 200v100c0 16.66 12.5 29.16 33.33 33.33h62.5c16.67 0 29.17-12.5 33.34-33.33v-100c125-20.84 208.33-108.34 208.33-220.84z" fill="#fff"/> <path d="M787.5 1595.83c-325-116.66-491.67-479.16-370.83-800 62.5-175 200-308.33 370.83-370.83 16.67-8.33 25-20.83 25-41.67V325c0-16.67-8.33-29.17-25-33.33-4.17 0-12.5 0-16.67 4.16-395.83 125-612.5 545.84-487.5 941.67 75 233.33 254.17 412.5 487.5 487.5 16.67 8.33 33.34 0 37.5-16.67 4.17-4.16 4.17-8.33 4.17-16.66v-58.34c0-12.5-12.5-29.16-25-37.5zM1229.17 295.83c-16.67-8.33-33.34 0-37.5 16.67-4.17 4.17-4.17 8.33-4.17 16.67v58.33c0 16.67 12.5 33.33 25 41.67 325 116.66 491.67 479.16 370.83 800-62.5 175-200 308.33-370.83 370.83-16.67 8.33-25 20.83-25 41.67V1700c0 16.67 8.33 29.17 25 33.33 4.17 0 12.5 0 16.67-4.16 395.83-125 612.5-545.84 487.5-941.67-75-237.5-258.34-416.67-487.5-491.67z" fill="#fff"/></svg>`,
         usdt: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 339.43 295.27"><title>tether-usdt-logo</title><path d="M62.15,1.45l-61.89,130a2.52,2.52,0,0,0,.54,2.94L167.95,294.56a2.55,2.55,0,0,0,3.53,0L338.63,134.4a2.52,2.52,0,0,0,.54-2.94l-61.89-130A2.5,2.5,0,0,0,275,0H64.45a2.5,2.5,0,0,0-2.3,1.45h0Z" style="fill:#50af95;fill-rule:evenodd"/><path d="M191.19,144.8v0c-1.2.09-7.4,0.46-21.23,0.46-11,0-18.81-.33-21.55-0.46v0c-42.51-1.87-74.24-9.27-74.24-18.13s31.73-16.25,74.24-18.15v28.91c2.78,0.2,10.74.67,21.74,0.67,13.2,0,19.81-.55,21-0.66v-28.9c42.42,1.89,74.08,9.29,74.08,18.13s-31.65,16.24-74.08,18.12h0Zm0-39.25V79.68h59.2V40.23H89.21V79.68H148.4v25.86c-48.11,2.21-84.29,11.74-84.29,23.16s36.18,20.94,84.29,23.16v82.9h42.78V151.83c48-2.21,84.12-11.73,84.12-23.14s-36.09-20.93-84.12-23.15h0Zm0,0h0Z" style="fill:#fff;fill-rule:evenodd"/><script xmlns=""/></svg>`,
       };
       window.smCompConfig = {
         "sm-input": [
           {
-            selector: "[data-eth-address]",
+            selector: "[data-sol-address]",
             customValidation: (value) => {
               if (!value)
                 return {
                   isValid: false,
-                  errorText: "Please enter a Ethereum address",
+                  errorText: "Please enter a Solana Wallet address",
                 };
               return {
-                isValid: ethOperator.isValidAddress(value),
-                errorText: `Invalid address.<br> It usually starts with "0x"`,
+                isValid: (() => {
+                  try {
+                    new solanaWeb3.PublicKey(value);
+                    return true;
+                  } catch {
+                    return false;
+                  }
+                })(),
+                errorText: `Invalid Solana Wallet address.`,
               };
             },
           },
@@ -617,7 +627,16 @@ t6 = Uint8Array.from(t5);
                   errorText: "Please enter a private key",
                 };
               return {
-                isValid: floCrypto.getPubKeyHex(value),
+                isValid: (() => {
+                  try {
+                    solanaWeb3.Keypair.fromSecretKey(
+                      Uint8Array.from(value.split(" ").map(Number))
+                    );
+                    return true;
+                  } catch {
+                    return false;
+                  }
+                })(),
                 errorText: `Invalid private key.`,
               };
             },
@@ -628,13 +647,12 @@ t6 = Uint8Array.from(t5);
               if (!value)
                 return {
                   isValid: false,
-                  errorText: "Please enter a private key or eth address",
+                  errorText: "Please enter a Solana Wallet address",
                 };
               return {
                 isValid: (() => {
                   try {
                     new solanaWeb3.PublicKey(value);
-                    document.getElementById("check_balance_button").removeAttribute('disabled');
                     return true;
                   } catch (err) {
                     return false;
@@ -646,7 +664,7 @@ t6 = Uint8Array.from(t5);
           },
         ],
       };
-     
+
       const router = new Router({
         routingStart(state) {},
         routingEnd(state) {
@@ -1222,7 +1240,7 @@ t6 = Uint8Array.from(t5);
                         type="number"
                         step="0.000001"
                         min="0.000001"
-                        error-text="Amount should be greater than 0.000001 SOL"
+                        error-text="Amount should be grater than 0.000001 SOL"
                         animate
                         required
                       >
@@ -1230,24 +1248,12 @@ t6 = Uint8Array.from(t5);
                           <svg
                             class="icon"
                             xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
+                            viewBox="0 0 32 32"
+                            fill="#000000"
                           >
-                            <g clip-path="url(#clip0_201_2)">
-                              <path
-                                d="M12 0L19.6368 12.4368L12.1633 16.8L4.36325 12.4368L12 0Z"
-                              />
-                              <path
-                                d="M12 24L4.36325 13.6099L11.8367 18L19.6368 13.6099L12 24Z"
-                              />
-                            </g>
-                            <defs>
-                              <clipPath id="clip0_201_2">
-                                <rect width="24" height="24" fill="white" />
-                              </clipPath>
-                            </defs>
+                            <path
+                              d="M16 0c8.837 0 16 7.163 16 16s-7.163 16-16 16S0 24.837 0 16 7.163 0 16 0zm8.706 19.517H10.34a.59.59 0 00-.415.17l-2.838 2.815a.291.291 0 00.207.498H21.66a.59.59 0 00.415-.17l2.838-2.816a.291.291 0 00-.207-.497zm-3.046-5.292H7.294l-.068.007a.291.291 0 00-.14.49l2.84 2.816.07.06c.1.07.22.11.344.11h14.366l.068-.007a.291.291 0 00.14-.49l-2.84-2.816-.07-.06a.59.59 0 00-.344-.11zM24.706 9H10.34a.59.59 0 00-.415.17l-2.838 2.816a.291.291 0 00.207.497H21.66a.59.59 0 00.415-.17l2.838-2.815A.291.291 0 0024.706 9z"
+                            />
                           </svg>
                         </div>
                       </sm-input>
@@ -1293,31 +1299,28 @@ t6 = Uint8Array.from(t5);
 
       function checkSenderBalance() {
         let address;
-        const privateKey = getRef("private_key_input").value.trim();
+        const privateKey = getRef("private_key_input").value;
         if (!privateKey)
           return notify(`Please enter sender's private key to check balance`);
-        if (
-          privateKey.startsWith("R") ||
-          privateKey.startsWith("L") ||
-          privateKey.startsWith("K")
-        ) {
-          address = floEthereum.ethAddressFromPrivateKey(
-            coinjs.wif2privkey(privateKey).privkey
+        if (privateKey) {
+          const privateKeyArray = Uint8Array.from(
+            privateKey.split(" ").map(Number)
           );
-        } else {
-          address = floEthereum.ethAddressFromPrivateKey(privateKey);
+          const keypair = solanaWeb3.Keypair.fromSecretKey(privateKeyArray);
+          address = keypair.publicKey.toString();
+          console.log('solana address', address)
         }
         getRef("sender_balance_container").classList.remove("hidden");
         renderElem(
           getRef("sender_balance_container"),
           html` Loading balance...<sm-spinner></sm-spinner> `
         );
-        const promises = [ethOperator.getBalance(address)];
+        const promises = [getWalletBalance(address)];
         const selectedAsset = getRef("asset_selector").value;
-        if (selectedAsset !== "ether")
+        if (selectedAsset !== "sol")
           promises.push(ethOperator.getTokenBalance(address, selectedAsset));
         Promise.all(promises)
-          .then(([ethBalance, tokenBalance]) => {
+          .then(([solBalance, tokenBalance]) => {
             renderElem(
               getRef("sender_balance_container"),
               html`
@@ -1334,8 +1337,8 @@ t6 = Uint8Array.from(t5);
                   </div>
                   <p>
                     Balance:
-                    <b class="amount-shown">${ethBalance} ETH</b>
-                    ${selectedAsset !== "ether"
+                    <b class="amount-shown">${solBalance} SOL</b>
+                    ${selectedAsset !== "sol"
                       ? html`|
                           <b class="amount-shown"
                             >${tokenBalance} ${selectedAsset.toUpperCase()}</b
@@ -1351,15 +1354,9 @@ t6 = Uint8Array.from(t5);
           });
       }
       function handleSenderInput(e) {
-        const privateKey = e.target.value;
-        const checkBalanceButton = getRef("check_balance_button");
-        const sendTxButton = getRef("send_tx_button");
-        if (privateKey.length >= 64) {
-          checkBalanceButton.removeAttribute("disabled");
-          sendTxButton.removeAttribute("disabled");
-        } else {
-          checkBalanceButton.setAttribute("disabled", "true");
-          sendTxButton.setAttribute("disabled", "true");
+        getRef("check_balance_button").disabled = !e.target.isValid;
+        if (!e.target.isValid) {
+          getRef("sender_balance_container").classList.add("hidden");
         }
       }
       function handleAssetChange(e) {
@@ -1397,7 +1394,7 @@ t6 = Uint8Array.from(t5);
           }
           privateKey = coinjs.wif2privkey(privateKey).privkey;
           switch (asset) {
-            case "ether": {
+            case "sol": {
               const tx = await ethOperator.sendTransaction({
                 privateKey,
                 receiver,
@@ -1630,7 +1627,6 @@ t6 = Uint8Array.from(t5);
           `
         );
       }
-    
     </script>
     <!-- <script>
       // Function to render elements (this function should be implemented to update your HTML)
