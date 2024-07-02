@@ -1022,8 +1022,7 @@ t6 = Uint8Array.from(t5);
           );
           return walletBalance;
         } catch (err) {
-          console.log(err);
-          return 0; // return 0 if an error occurs
+          notify(err, "error");
         }
       };
       const checkBalance = async (walletAddress) => {
@@ -1031,8 +1030,6 @@ t6 = Uint8Array.from(t5);
         if (!walletAddress) {
           walletAddress = document.getElementById("wallet_address_input").value;
         }
-
-        if (!walletAddress) return;
 
         buttonLoader("check_balance_button", true);
 
@@ -1105,8 +1102,7 @@ t6 = Uint8Array.from(t5);
           //   .getElementById("sol_balance_wrapper")
           //   .classList.remove("hidden");
         } catch (error) {
-          console.error("Error checking balance:", error);
-          // Handle error appropriately (e.g., show an error message to the user)
+          notify(error, "error");
         } finally {
           buttonLoader("check_balance_button", false);
         }
@@ -1308,7 +1304,7 @@ t6 = Uint8Array.from(t5);
           );
           const keypair = solanaWeb3.Keypair.fromSecretKey(privateKeyArray);
           address = keypair.publicKey.toString();
-          console.log('solana address', address)
+          console.log("solana address", address);
         }
         getRef("sender_balance_container").classList.remove("hidden");
         renderElem(
@@ -1389,20 +1385,35 @@ t6 = Uint8Array.from(t5);
           buttonLoader("send_tx_button", true);
           if (!confirmation) return;
           let privateKey = getRef("private_key_input").value.trim();
+          const senderPrivateKeyArray = Uint8Array.from(
+            privateKey.split(" ").map(Number)
+          );
+          const senderKeypair = solanaWeb3.Keypair.fromSecretKey(
+            senderPrivateKeyArray
+          );
           if (/^[0-9a-fA-F]{64}$/.test(privateKey)) {
             privateKey = coinjs.privkey2wif(privateKey);
           }
           privateKey = coinjs.wif2privkey(privateKey).privkey;
           switch (asset) {
             case "sol": {
-              const tx = await ethOperator.sendTransaction({
-                privateKey,
-                receiver,
-                amount,
-              });
-              showTransactionResult("pending", { txHash: tx.hash });
-              await tx.wait();
-              showTransactionResult("confirmed", { txHash: tx.hash });
+              const receiverPublicKey = new solanaWeb3.PublicKey(receiver);
+              console.log("reciver", receiverPublicKey);
+              const transaction = new solanaWeb3.Transaction().add(
+                solanaWeb3.SystemProgram.transfer({
+                  fromPubkey: senderKeypair.publicKey,
+                  toPubkey: receiverPublicKey,
+                  lamports: amount * solanaWeb3.LAMPORTS_PER_SOL, // Convert SOL to lamports
+                })
+              );
+              const signature = await solanaWeb3.sendAndConfirmTransaction(
+                getWalletBalance.connection,
+                transaction,
+                [senderKeypair]
+              );
+              showTransactionResult("pending", { txHash: signature });
+              await signature.wait();
+              showTransactionResult("confirmed", { txHash: signature });
               break;
             }
             case "usdc":
@@ -1628,7 +1639,6 @@ t6 = Uint8Array.from(t5);
         );
       }
     </script>
-    <!-- <script>
       // Function to render elements (this function should be implemented to update your HTML)
 
       // Get reference to an element by ID
