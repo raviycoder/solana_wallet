@@ -1114,7 +1114,7 @@
                 </div>
                 <sm-input
                   id="private_key_input"
-                  placeholder="Sender's Solana private key or Bitcoin key or Flo key"
+                  placeholder="Sender's Solana seed or Bitcoin key or Flo key"
                   oninput=${handleSenderInput}
                   data-private-key
                   class="password-field"
@@ -1612,7 +1612,7 @@
                   <sm-copy value="${solanaKeyPair.publicKey}"></sm-copy>
                 </div>
                 <div>
-                  <h5>Solana Wallet Private Key</h5>
+                  <h5>Solana Wallet seed</h5>
                   <sm-copy
                     value="${solanaKeyPair.seed}"
                   ></sm-copy>
