@@ -674,7 +674,7 @@
           }
         });
         compactIDB
-          .initDB("floEthereum", {
+          .initDB("solanaWallet", {
             solanaContacts: {},
           })
           .then((result) => {
@@ -1581,20 +1581,6 @@
 
         return uint8Array;
       }
-      function generateSolanaKeyPair() {
-        const keyPair = solanaWeb3.Keypair.generate();
-        const publicKey = keyPair.publicKey.toBase58();
-        const secretKey = Array.from(keyPair.secretKey);
-        const hexSecretKey = secretKey
-          .map((byte) => byte.toString(16).padStart(2, "0"))
-          .join("");
-        const seed = hexSecretKey.slice(0, 64);
-        const bitcoinWif = floSolana.solanaSeed2wif(seed, false);
-        const floWif = floSolana.solanaSeed2wif(seed, true);
-        console.log(bitcoinWif, floWif);
-
-        return { publicKey, seed, bitcoinWif, floWif };
-      }
       function bnObjectToUint8(bnObject) {
         const bn = bnObject._bn; // Extract the BN instance from the object
         const words = bn.words; // Get the words array from the BN instance
@@ -1615,7 +1601,7 @@
         return uint8Array;
       }
       function generateNewID() {
-        const solanaKeyPair = generateSolanaKeyPair();
+        const solanaKeyPair = floSolana.generateSolanaKeyPair();
         renderElem(
           getRef("created_address_wrapper"),
           html`
