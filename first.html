@@ -1,64 +1,9 @@
-<!-- <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
-<script src="
-https://cdn.jsdelivr.net/npm/bs58@5.0.0/index.min.js
-"></script>
-<script>
-	function bnObjectToUint8(bnObject) {
-    const bn = bnObject._bn; // Extract the BN instance from the object
-    const words = bn.words; // Get the words array from the BN instance
-
-    // Convert each word to its corresponding bytes
-    const byteArray = [];
-    for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-        byteArray.push((word >> 24) & 0xFF); // Extract first byte
-        byteArray.push((word >> 16) & 0xFF); // Extract second byte
-        byteArray.push((word >> 8) & 0xFF);  // Extract third byte
-        byteArray.push(word & 0xFF);         // Extract fourth byte
-    }
-
-    // Create Uint8Array from the byte array
-    const uint8Array = new Uint8Array(byteArray);
-
-    return uint8Array;
-}
-
-
-
-
-var generateKey = async () => {
-  const keyPair = solanaWeb3.Keypair.generate();
-
-  console.log("Public Key:", keyPair.publicKey.toString());
-  console.log("Secret Key:", keyPair.secretKey)
-};
-
-
-var x1 = solanaWeb3.Keypair.generate();
-var x2 = generateKey();
-const walletKeyPair = solanaWeb3.Keypair.fromSecretKey(new Uint8Array(bs58.decode(process.env['PRIVATE_KEY'])));
-console.log("private key", walletKeyPair)
-
-var x3 = x1.publicKey.toBase58();
-console.log("the value", x3)
-
-
-const script = document.createElement('script');
-script.src = 'https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js';
-document.head.appendChild(script);
-
-t3 = Array.from(x1.secretKey);
-t4 = coinjs.base58encode(t3);
-t5 = coinjs.base58decode(t4);
-t6 = Uint8Array.from(t5);
-</script> -->
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Solana Wallet Example</title>
+    <title>Solana Wallet</title>
     <link rel="stylesheet" href="css/main.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -66,12 +11,19 @@ t6 = Uint8Array.from(t5);
       href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap"
       rel="stylesheet"
     />
-    <!-- Include Solana Web3.js and bs58 libraries from CDNs -->
-
-    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bs58@5.0.0/index.min.js"></script>
   </head>
-  <body>
+
+  <body class="hidden">
+    <sm-notifications id="notification_drawer"></sm-notifications>
+    <sm-popup id="confirmation_popup">
+      <h4 id="confirm_title"></h4>
+      <p id="confirm_message" class="breakable"></p>
+      <div class="flex align-center gap-0-5 margin-left-auto">
+        <button class="button cancel-button">Cancel</button>
+        <button class="button button--primary confirm-button">OK</button>
+      </div>
+    </sm-popup>
+    <!-- // Main file to control all ui files -->
     <main>
       <header id="main_header">
         <div id="logo" class="app-brand">
@@ -257,17 +209,6 @@ t6 = Uint8Array.from(t5);
       </nav>
       <div id="page_container"></div>
     </main>
-    <div id="created_address_wrapper"></div>
-    <sm-notifications id="notification_drawer"></sm-notifications>
-    <sm-popup id="confirmation_popup">
-      <h4 id="confirm_title"></h4>
-      <p id="confirm_message" class="breakable"></p>
-      <div class="flex align-center gap-0-5 margin-left-auto">
-        <button class="button cancel-button">Cancel</button>
-        <button class="button button--primary confirm-button">OK</button>
-      </div>
-    </sm-popup>
-    <!-- // Main file to control all ui files -->
     <sm-popup id="transaction_result_popup">
       <header slot="header" class="popup__header">
         <div class="flex align-center">
@@ -298,15 +239,25 @@ t6 = Uint8Array.from(t5);
         expirationDays: 60,
       };
     </script>
+    <script src="https://unpkg.com/uhtml@3.0.1/es.js"></script>
+    <script src="scripts/components.min.js" type="text/javascript"></script>
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bs58@5.0.0/index.min.js"></script>
+    <script
+      src="scripts/btcwallet_scripts_lib.js"
+      type="text/javascript"
+    ></script>
+    <script src="scripts/btcOperator.js" type="text/javascript"></script>
     <script src="scripts/floCrypto.js" type="text/javascript"></script>
+    <script src="scripts/floSolana.js" type="text/javascript"></script>
     <script src="scripts/tap_combined.js" type="text/javascript"></script>
     <script src="scripts/keccak.js" type="text/javascript"></script>
     <script src="scripts/floEthereum.js" type="text/javascript"></script>
-    <script src="https://unpkg.com/uhtml@3.0.1/es.js"></script>
-    <script src="scripts/components.min.js" type="text/javascript"></script>
     <script src="scripts/compactIDB.js" type="text/javascript"></script>
+    <script
+      src="https://cdn.ethers.io/lib/ethers-5.6.umd.min.js"
+      type="text/javascript"
+    ></script>
     <script src="scripts/ethOperator.js" type="text/javascript"></script>
     <script>
       const uiGlobals = {};
@@ -509,6 +460,7 @@ t6 = Uint8Array.from(t5);
           if (potentialTarget) potentialTarget.remove();
         }
       }
+
       class Router {
         /**
          * @constructor {object} options - options for the router
@@ -603,18 +555,19 @@ t6 = Uint8Array.from(t5);
               if (!value)
                 return {
                   isValid: false,
-                  errorText: "Please enter a Solana Wallet address",
+                  errorText: "Please enter a Solana Wallet address or Bitcoin key or Flo key",
                 };
               return {
                 isValid: (() => {
                   try {
-                    new solanaWeb3.PublicKey(value);
+                    const valueKey = value.length <= 44 ? value : floSolana.wif2SolanaAddress(value)
+                    new solanaWeb3.PublicKey(valueKey);
                     return true;
                   } catch {
                     return false;
                   }
                 })(),
-                errorText: `Invalid Solana Wallet address.`,
+                errorText: `Invalid Solana Wallet address or Bitcoin key or Flo key.`,
               };
             },
           },
@@ -624,20 +577,22 @@ t6 = Uint8Array.from(t5);
               if (!value)
                 return {
                   isValid: false,
-                  errorText: "Please enter a private key",
+                  errorText: "Please enter a private key or Bitcoin key or Flo key",
                 };
               return {
                 isValid: (() => {
                   try {
-                    solanaWeb3.Keypair.fromSecretKey(
-                      Uint8Array.from(value.split(" ").map(Number))
+                    const secret = value.length <64? floSolana.wif2SolanaSecret(value) : floSolana.solanaSeed2SolanaSecret(value);
+                    const secretKey = floSolana.solanaSecret2UsableInCode(secret);
+                    const keypair = solanaWeb3.Keypair.fromSecretKey(
+                      Uint8Array.from(secretKey.toString().split(",").map(Number))
                     );
                     return true;
-                  } catch {
+                  } catch (err) {
                     return false;
                   }
                 })(),
-                errorText: `Invalid private key.`,
+                errorText: `Invalid private key or Bitcoin key or Flo key`,
               };
             },
           },
@@ -647,18 +602,24 @@ t6 = Uint8Array.from(t5);
               if (!value)
                 return {
                   isValid: false,
-                  errorText: "Please enter a Solana Wallet address",
+                  errorText: "Please enter a Solana Wallet address  or Bitcoin key or Flo key",
                 };
               return {
                 isValid: (() => {
                   try {
-                    new solanaWeb3.PublicKey(value);
+                    const solana = new solanaWeb3.PublicKey(value);
                     return true;
                   } catch (err) {
-                    return false;
+                    try {
+                      const solonaAdress = floSolana.validationOfWif(value);
+                      new solanaWeb3.PublicKey(solonaAdress);
+                      return true;
+                    } catch (error) {
+                      return false;
+                    }
                   }
                 })(),
-                errorText: "Invalid Solana wallet address",
+                errorText: "Invalid Solana wallet address or Bitcoin key or Flo key",
               };
             },
           },
@@ -801,13 +762,13 @@ t6 = Uint8Array.from(t5);
               <ul id="searched_addresses_list" class="grid gap-0-5"></ul>
             </aside>
             <section id="balance_section" class="grid gap-1-5">
-              <h2>Check Solana wallet SOL balance</h2>
+              <h2>Check Solana wallet  SOL balance</h2>
               <sm-form>
                 <div id="input_wrapper">
                   <sm-input
                     id="wallet_address_input"
                     class="password-field flex-1"
-                    placeholder="Solana wallet address"
+                    placeholder="Solana wallet address or Bitcoin key or Flo key"
                     type="password"
                     animate
                     required
@@ -1031,6 +992,12 @@ t6 = Uint8Array.from(t5);
           walletAddress = document.getElementById("wallet_address_input").value;
         }
 
+        walletAddress =
+          walletAddress.length <= 44
+            ? walletAddress
+            : floSolana.wif2SolanaAddress(walletAddress);
+        console.log("wallet", walletAddress);
+
         buttonLoader("check_balance_button", true);
 
         try {
@@ -1147,7 +1114,7 @@ t6 = Uint8Array.from(t5);
                 </div>
                 <sm-input
                   id="private_key_input"
-                  placeholder="Sender's Solana private key"
+                  placeholder="Sender's Solana private key or Bitcoin key or Flo key"
                   oninput=${handleSenderInput}
                   data-private-key
                   class="password-field"
@@ -1224,7 +1191,7 @@ t6 = Uint8Array.from(t5);
                   <div class="grid gap-0-5">
                     <sm-input
                       class="receiver-address"
-                      placeholder="Receiver's Solana address"
+                      placeholder="Receiver's Solana address or Bitcoin key or Flo key"
                       data-sol-address
                       animate
                       required
@@ -1295,13 +1262,16 @@ t6 = Uint8Array.from(t5);
 
       function checkSenderBalance() {
         let address;
-        const privateKey = getRef("private_key_input").value;
+        const secret = getRef("private_key_input").value;
+        const pKey = secret.length < 64? floSolana.wif2SolanaSecret(secret) : floSolana.solanaSeed2SolanaSecret(secret);
+        const privateKey = floSolana.solanaSecret2UsableInCode(pKey);
         if (!privateKey)
           return notify(`Please enter sender's private key to check balance`);
         if (privateKey) {
           const privateKeyArray = Uint8Array.from(
-            privateKey.split(" ").map(Number)
+            privateKey.toString().split(",").map(Number)
           );
+          console.log(privateKeyArray);
           const keypair = solanaWeb3.Keypair.fromSecretKey(privateKeyArray);
           address = keypair.publicKey.toString();
           console.log("solana address", address);
@@ -1370,9 +1340,11 @@ t6 = Uint8Array.from(t5);
         getRef("send_tx_button").textContent = `Send ${asset.toUpperCase()}`;
       }
       async function sendTx() {
-        const receiver = getRef("send_tx_form")
+        const receiverKey = getRef("send_tx_form")
           .querySelector(".receiver-address")
           .value.trim();
+          const receiver = receiverKey.length <= 44 ? receiverKey: floSolana.wif2SolanaAddress(receiverKey)
+          console.log(receiver)
         const amount = getRef("send_tx_form")
           .querySelector(".receiver-amount")
           .value.trim();
@@ -1558,7 +1530,7 @@ t6 = Uint8Array.from(t5);
           getRef("page_container"),
           html`
             <div class="grid gap-1">
-              <h2>Don't have an Solana Wallet Address? Create one</h2>
+              <h2>Don't have an Solana Wallet Address or Bitcoin key or Flo key? Create one</h2>
               <button
                 class="button button--primary interactive gap-0-5 margin-right-auto"
                 onclick=${generateNewID}
@@ -1590,12 +1562,38 @@ t6 = Uint8Array.from(t5);
           `
         );
       });
+      function bnObjectToUint8(bnObject) {
+        const bn = bnObject._bn; // Extract the BN instance from the object
+        const words = bn.words; // Get the words array from the BN instance
+
+        // Convert each word to its corresponding bytes
+        const byteArray = [];
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i];
+          byteArray.push((word >> 24) & 0xff); // Extract first byte
+          byteArray.push((word >> 16) & 0xff); // Extract second byte
+          byteArray.push((word >> 8) & 0xff); // Extract third byte
+          byteArray.push(word & 0xff); // Extract fourth byte
+        }
+
+        // Create Uint8Array from the byte array
+        const uint8Array = new Uint8Array(byteArray);
+
+        return uint8Array;
+      }
       function generateSolanaKeyPair() {
         const keyPair = solanaWeb3.Keypair.generate();
         const publicKey = keyPair.publicKey.toBase58();
-        const secretKey = Array.from(keyPair.secretKey); // Converting Uint8Array to array for better display/log
+        const secretKey = Array.from(keyPair.secretKey);
+        const hexSecretKey = secretKey
+          .map((byte) => byte.toString(16).padStart(2, "0"))
+          .join("");
+        const seed = hexSecretKey.slice(0, 64);
+        const bitcoinWif = floSolana.solanaSeed2wif(seed, false);
+        const floWif = floSolana.solanaSeed2wif(seed, true);
+        console.log(bitcoinWif, floWif);
 
-        return { publicKey, secretKey };
+        return { publicKey, seed, bitcoinWif, floWif };
       }
       function bnObjectToUint8(bnObject) {
         const bn = bnObject._bn; // Extract the BN instance from the object
@@ -1630,250 +1628,27 @@ t6 = Uint8Array.from(t5);
                 <div>
                   <h5>Solana Wallet Private Key</h5>
                   <sm-copy
-                    value="${solanaKeyPair.secretKey.join(" ")}"
+                    value="${solanaKeyPair.seed}"
                   ></sm-copy>
                 </div>
               </li>
+              <li class="grid gap-0-5">
+                <div>
+                  <h5>Bitcoin key</h5>
+                  <sm-copy value="${solanaKeyPair.bitcoinWif}"></sm-copy>
+                </div>
+                <div>
+                  <h5>Flo key</h5>
+                  <sm-copy
+                    value="${solanaKeyPair.floWif}"
+                  ></sm-copy>
+                </div>
+              </li>
+            </ul>
             </ul>
           `
         );
       }
     </script>
-      // Function to render elements (this function should be implemented to update your HTML)
-
-      // Get reference to an element by ID
-      //   function getRef(id) {
-      //     return document.getElementById(id);
-      //   }
-
-      //   // Function to generate a new Solana keypair and return the details
-      //   function generateSolanaKeyPair() {
-      //     const keyPair = solanaWeb3.Keypair.generate();
-      //     const publicKey = keyPair.publicKey.toBase58();
-      //     const secretKey = Array.from(keyPair.secretKey); // Converting Uint8Array to array for better display/log
-
-      //     return { publicKey, secretKey };
-      //   }
-      //   function bnObjectToUint8(bnObject) {
-      //     const bn = bnObject._bn; // Extract the BN instance from the object
-      //     const words = bn.words; // Get the words array from the BN instance
-
-      //     // Convert each word to its corresponding bytes
-      //     const byteArray = [];
-      //     for (let i = 0; i < words.length; i++) {
-      //       const word = words[i];
-      //       byteArray.push((word >> 24) & 0xff); // Extract first byte
-      //       byteArray.push((word >> 16) & 0xff); // Extract second byte
-      //       byteArray.push((word >> 8) & 0xff); // Extract third byte
-      //       byteArray.push(word & 0xff); // Extract fourth byte
-      //     }
-
-      //     // Create Uint8Array from the byte array
-      //     const uint8Array = new Uint8Array(byteArray);
-
-      //     return uint8Array;
-      //   }
-      //   function generateNewID() {
-      //     const { floID, privKey } = floCrypto.generateNewID();
-      //     const ethPrivateKey = coinjs.wif2privkey(privKey).privkey;
-      //     const ethAddress = floEthereum.ethAddressFromPrivateKey(ethPrivateKey);
-      //     renderElem(
-      //       getRef("created_address_wrapper"),
-      //       html`
-      //         <ul id="generated_addresses" class="grid gap-1-5">
-      //           <li class="grid gap-0-5">
-      //             <div>
-      //               <h5>FLO Address</h5>
-      //               <sm-copy value="${floID}"></sm-copy>
-      //             </div>
-      //             <div>
-      //               <h5>Private Key</h5>
-      //               <sm-copy value="${privKey}"></sm-copy>
-      //             </div>
-      //           </li>
-      //           <li class="grid gap-0-5">
-      //             <div>
-      //               <h5>Equivalent Ethereum Address</h5>
-      //               <sm-copy value="${ethAddress}"></sm-copy>
-      //             </div>
-      //             <div>
-      //               <h5>Private Key</h5>
-      //               <sm-copy value="${ethPrivateKey}"></sm-copy>
-      //             </div>
-      //           </li>
-      //         </ul>
-      //       `
-      //     );
-      //   }
-      //   function generateNewID() {
-      //     const solanaKeyPair = generateSolanaKeyPair();
-
-      //     // Logging the public and private keys
-      //     console.log("Solana Public Key:", solanaKeyPair.publicKey);
-      //     console.log("Solana Secret Key:", solanaKeyPair.secretKey.join(" ")); // Joined as string for logging
-
-      //     // Render the generated keys in the HTML
-      //     renderElem(
-      //       getRef("created_address_wrapper"),
-      //       `
-      // <ul id="generated_addresses" class="grid gap-1-5">
-      //     <li class="grid gap-0-5">
-      //         <div>
-      //             <h5>Solana Address</h5>
-      //             <h3>${solanaKeyPair.publicKey}</h3>
-      //             <sm-copy value="${solanaKeyPair.publicKey}"></sm-copy>
-      //         </div>
-      //         <div>
-      //             <h5>Secret Key</h5>
-      //             <h3>${solanaKeyPair.secretKey.join(" ")}</h3>
-      //             <sm-copy value="${solanaKeyPair.secretKey.join(" ")}"></sm-copy>
-      //         </div>
-      //         <div>
-      //             <h5>Wallet Balance</h5>
-      //             <h3 id="wallet_balance">Loading...</h3>
-      //         </div>
-      //     </li>
-      // </ul>
-      // `
-      //     );
-
-      //     // Get wallet balance and display
-      //     getWalletBalance().then((balance) => {
-      //       const balanceElem = document.getElementById("wallet_balance");
-      //       if (balanceElem) {
-      //         balanceElem.textContent = `${balance} lamports`;
-      //       }
-      //     });
-
-      //     return solanaKeyPair;
-      //   }
-      // //   // Function to check balance for a Solana address
-      //   // async function checkBalance(address) {
-      //   //   const connection = new solanaWeb3.Connection("https://solana-mainnet.core.chainstack.com/3eb691b8be8f475e3a74f765abfa0b03", {wsEndpoint:"wss://solana-mainnet.core.chainstack.com/3eb691b8be8f475e3a74f765abfa0b03"}
-      //   //   );
-      //   //   const balance = await connection.getBalance(
-      //   //     new solanaWeb3.PublicKey(address)
-      //   //   );
-      //   //   return balance / solanaWeb3.LAMPORTS_PER_SOL; // Convert lamports to SOL
-      //   // }
-      // const getWalletBalance = async () => {
-      //   try {
-      //     const connection = new solanaWeb3.Connection(
-      //       solanaWeb3.clusterApiUrl("devnet"),
-      //       "confirmed"
-      //     );
-      //     console.log("Connection object is:", connection);
-      //     const myWallet = await solanaWeb3.Keypair.fromSecretKey(privateKey);
-      //     const walletBalance = await connection.getBalance(
-      //       new solanaWeb3.PublicKey(myWallet.publicKey)
-      //     );
-      //     console.log(`Wallet balance: ${parseInt(walletBalance)} lamports`);
-      //     return parseInt(walletBalance);
-      //   } catch (err) {
-      //     console.log(err);
-      //     return 100; // or any other default value if an error occurs
-      //   }
-      // };
-
-      // console.log("solana",getWalletBalance())
-
-      // const getWalletBalance = async (
-      //   privateKeyString,
-      //   walletAddressString
-      // ) => {
-      //   try {
-      //     const connection = solanaWeb3.Connection(
-      // "https://solana-mainnet.core.chainstack.com/3eb691b8be8f475e3a74f765abfa0b03",
-      // {
-      //   wsEndpoint:
-      //     "wss://solana-mainnet.core.chainstack.com/3eb691b8be8f475e3a74f765abfa0b03",
-      // }
-      //     );
-      //     console.log("Connection object is:", connection);
-
-      //     // Convert the private key string to a Uint8Array
-      //     const privateKeyArray = Uint8Array.from(
-      //       privateKeyString.split(" ").map(Number)
-      //     );
-      //     const myWallet = solanaWeb3.Keypair.fromSecretKey(privateKeyArray);
-
-      //     // Create a PublicKey object from the wallet address string
-      //     const walletPublicKey = new solanaWeb3.PublicKey(walletAddressString);
-
-      //     const walletBalance = await connection.getBalance(walletPublicKey);
-      //     console.log(`Wallet balance: ${parseInt(walletBalance)} lamports`);
-      //     return parseInt(walletBalance);
-      //   } catch (err) {
-      //     console.log(err);
-      //     return 100; // or any other default value if an error occurs
-      //   }
-      // };
-
-      // // Example usage
-      // const privateKey =
-      //   "21 27 147 242 103 232 213 237 160 155 211 43 9 252 88 75 229 223 175 166 45 171 172 180 251 114 21 105 9 43 210 16 69 120 171 40 159 101 168 29 193 203 132 97 116 225 30 228 249 87 31 160 242 98 216 190 82 132 187 167 45 203 13 86";
-      // const walletAddress = "5gBrMxS9YgFXHiFWkDan9NxKXu172xYkvGAH6DEuzGZs";
-      // console.log("solana walle", getWalletBalance(privateKey, walletAddress)); // Example usage:
-      // const privateKey = "<Your Private Key>";
-      // const walletAddress = "<Your Wallet Address>";
-      // getWalletBalance(privateKey, walletAddress);
-
-      //   console.log(
-      //     "dfere",
-      //     getWalletBalance().then((value) => console.log("hero bro", value))
-      //   );
-      //   // console.log("hero bro", checkBalance(generateNewID().publicKey));
-      //   // Function to send tokens from one Solana address to another
-      //   async function sendTokens(senderPrivateKey, recipientAddress, amount) {
-      //     const connection = new solanaWeb3.Connection(
-      //       solanaWeb3.clusterApiUrl("mainnet-beta")
-      //     );
-      //     const senderSecretKey = bs58.decode(senderPrivateKey);
-      //     const senderKeypair = solanaWeb3.Keypair.fromSecretKey(senderSecretKey);
-
-      //     const transaction = new solanaWeb3.Transaction().add(
-      //       solanaWeb3.SystemProgram.transfer({
-      //         fromPubkey: senderKeypair.publicKey,
-      //         toPubkey: new solanaWeb3.PublicKey(recipientAddress),
-      //         lamports: amount * solanaWeb3.LAMPORTS_PER_SOL, // Convert SOL to lamports
-      //       })
-      //     );
-
-      //     const signature = await solanaWeb3.sendAndConfirmTransaction(
-      //       connection,
-      //       transaction,
-      //       [senderKeypair]
-      //     );
-
-      //     return signature;
-      //   }
-
-      //   // Example usage
-      //   document.addEventListener("DOMContentLoaded", (event) => {
-      //     generateNewID(); // Generate and display Solana key pair
-
-      //     // Example check balance (replace 'example_solana_address_here' with actual address)
-      //     checkBalance("example_solana_address_here")
-      //       .then((balance) => {
-      //         console.log("Solana Balance:", balance);
-      //       })
-      //       .catch((error) => {
-      //         console.error("Error:", error);
-      //       });
-
-      //     // Example send tokens (replace with actual sender private key and recipient address)
-      //     sendTokens(
-      //       "example_sender_private_key_here",
-      //       "recipient_solana_address_here",
-      //       1
-      //     )
-      //       .then((signature) => {
-      //         console.log("Transaction Signature:", signature);
-      //       })
-      //       .catch((error) => {
-      //         console.error("Error:", error);
-      //       });
-      //   });
-    </script> -->
   </body>
 </html>
