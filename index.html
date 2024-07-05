@@ -1008,8 +1008,8 @@
         }
 
         const convert2Address = walletAddress.startsWith("R")
-          ? floSolana.getAddress(walletAddress)
-          : floSolana.getAddress(walletAddress, true);
+          ? floCrypto.getAddress(walletAddress)
+          : floCrypto.getAddress(walletAddress, true);
         const isfloaddr = walletAddress.length <= 44 ? "" : convert2Address;
 
         walletAddress =

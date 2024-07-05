@@ -403,8 +403,8 @@
     const seed = hexSecretKey.slice(0, 64);
     const bitcoinWif = floSolana.solanaSeed2wif(seed, false);
     const floWif = floSolana.solanaSeed2wif(seed, true);
-    const floAddress = getAddress(floWif);
-    const bitcoinAddress = getAddress(bitcoinWif, true);
+    const floAddress = floCrypto.getAddress(floWif);
+    const bitcoinAddress = floCrypto.getAddress(bitcoinWif, true);
     const address = getPrivateKeyFromAddress(bitcoinAddress, false)
     console.log("floAddress", floAddress, bitcoinAddress, address);
     return { publicKey, seed, bitcoinWif, floWif, floAddress, bitcoinAddress };
