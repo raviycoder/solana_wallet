@@ -555,19 +555,19 @@
               if (!value)
                 return {
                   isValid: false,
-                  errorText: "Please enter a Solana Wallet address or Bitcoin key or Flo key",
+                  errorText:
+                    "Please enter a Solana address",
                 };
               return {
                 isValid: (() => {
                   try {
-                    const valueKey = value.length <= 44 ? value : floSolana.wif2SolanaAddress(value)
-                    new solanaWeb3.PublicKey(valueKey);
+                    new solanaWeb3.PublicKey(value);
                     return true;
                   } catch {
                     return false;
                   }
                 })(),
-                errorText: `Invalid Solana Wallet address or Bitcoin key or Flo key.`,
+                errorText: `Invalid Solana address.`,
               };
             },
           },
@@ -577,22 +577,29 @@
               if (!value)
                 return {
                   isValid: false,
-                  errorText: "Please enter a private key or Bitcoin key or Flo key",
+                  errorText:
+                    "Please enter a Solana seed or Bitcoin or Flo private key",
                 };
               return {
                 isValid: (() => {
                   try {
-                    const secret = value.length <64? floSolana.wif2SolanaSecret(value) : floSolana.solanaSeed2SolanaSecret(value);
-                    const secretKey = floSolana.solanaSecret2UsableInCode(secret);
+                    const secret =
+                      value.length < 64
+                        ? floSolana.wif2SolanaSecret(value)
+                        : floSolana.solanaSeed2SolanaSecret(value);
+                    const secretKey =
+                      floSolana.solanaSecret2UsableInCode(secret);
                     const keypair = solanaWeb3.Keypair.fromSecretKey(
-                      Uint8Array.from(secretKey.toString().split(",").map(Number))
+                      Uint8Array.from(
+                        secretKey.toString().split(",").map(Number)
+                      )
                     );
                     return true;
                   } catch (err) {
                     return false;
                   }
                 })(),
-                errorText: `Invalid private key or Bitcoin key or Flo key`,
+                errorText: `Invalid Solana seed or Bitcoin or Flo private key`,
               };
             },
           },
@@ -602,7 +609,8 @@
               if (!value)
                 return {
                   isValid: false,
-                  errorText: "Please enter a Solana Wallet address  or Bitcoin key or Flo key",
+                  errorText:
+                    "Please enter a Solana address  or Bitcoin or Flo private key",
                 };
               return {
                 isValid: (() => {
@@ -619,7 +627,8 @@
                     }
                   }
                 })(),
-                errorText: "Invalid Solana wallet address or Bitcoin key or Flo key",
+                errorText:
+                  "Invalid Solana address or Bitcoin or Flo private key",
               };
             },
           },
@@ -762,13 +771,13 @@
               <ul id="searched_addresses_list" class="grid gap-0-5"></ul>
             </aside>
             <section id="balance_section" class="grid gap-1-5">
-              <h2>Check Solana wallet  SOL balance</h2>
+              <h2>Check Solana wallet SOL balance</h2>
               <sm-form>
                 <div id="input_wrapper">
                   <sm-input
                     id="wallet_address_input"
                     class="password-field flex-1"
-                    placeholder="Solana wallet address or Bitcoin key or Flo key"
+                    placeholder="Solana address or Bitcoin or Flo private key"
                     type="password"
                     animate
                     required
@@ -931,12 +940,18 @@
               return;
             }
             const renderedContacts = [];
-            for (const walletAddress in solanaContacts) {
-              renderedContacts.push(html` <li
+            for (const keys in solanaContacts) {
+              const walletAddress = solanaContacts[keys].walletAddress;
+              const isFloAddr = solanaContacts[keys].isfloaddr;
+              console.log("isfloaddr", isFloAddr);
+              renderedContacts.push(html`<li
                 class="contact"
-                .dataset=${{ walletAddress }}
+                .dataset=${{ address: walletAddress }}
               >
                 <sm-copy value="${walletAddress}"></sm-copy>
+                ${!isFloAddr
+                  ? null
+                  : html`<sm-copy value="${isFloAddr}"></sm-copy>`}
                 <div class="flex align-center space-between gap-0-5">
                   <button
                     class="button button--small"
@@ -992,11 +1007,20 @@
           walletAddress = document.getElementById("wallet_address_input").value;
         }
 
+        const convert2Address = walletAddress.startsWith("R")
+          ? floSolana.getAddress(walletAddress)
+          : floSolana.getAddress(walletAddress, true);
+        const isfloaddr = walletAddress.length <= 44 ? "" : convert2Address;
+
         walletAddress =
           walletAddress.length <= 44
             ? walletAddress
             : floSolana.wif2SolanaAddress(walletAddress);
-        console.log("wallet", walletAddress);
+
+        const Keys = !isfloaddr
+          ? { walletAddress }
+          : { walletAddress, isfloaddr };
+        console.log("wallet", Keys);
 
         buttonLoader("check_balance_button", true);
 
@@ -1010,12 +1034,8 @@
             walletAddress
           );
           if (!contactExists) {
-            await compactIDB.addData(
-              "solanaContacts",
-              { walletAddress },
-              walletAddress
-            );
-            renderSearchedAddressList();
+            await compactIDB.addData("solanaContacts", Keys, walletAddress);
+            await renderSearchedAddressList();
           }
 
           // Render the balances
@@ -1114,7 +1134,7 @@
                 </div>
                 <sm-input
                   id="private_key_input"
-                  placeholder="Sender's Solana seed or Bitcoin key or Flo key"
+                  placeholder="Sender's Solana seed or Bitcoin or Flo private key"
                   oninput=${handleSenderInput}
                   data-private-key
                   class="password-field"
@@ -1191,7 +1211,7 @@
                   <div class="grid gap-0-5">
                     <sm-input
                       class="receiver-address"
-                      placeholder="Receiver's Solana address or Bitcoin key or Flo key"
+                      placeholder="Receiver's Solana address"
                       data-sol-address
                       animate
                       required
@@ -1199,7 +1219,7 @@
                     <div class="flex flex-direction-column gap-0-5">
                       <sm-input
                         class="receiver-amount amount-shown flex-1"
-                        placeholder="Amount"
+                        placeholder="SOL Amount"
                         type="number"
                         step="0.000001"
                         min="0.000001"
@@ -1220,14 +1240,6 @@
                           </svg>
                         </div>
                       </sm-input>
-                      <sm-chips
-                        id="asset_selector"
-                        onchange=${handleAssetChange}
-                      >
-                        <sm-chip value="sol" selected>SOL</sm-chip>
-                        <sm-chip value="usdc">USDC</sm-chip>
-                        <sm-chip value="usdt">USDT</sm-chip>
-                      </sm-chips>
                     </div>
                   </div>
                 </div>
@@ -1263,7 +1275,10 @@
       function checkSenderBalance() {
         let address;
         const secret = getRef("private_key_input").value;
-        const pKey = secret.length < 64? floSolana.wif2SolanaSecret(secret) : floSolana.solanaSeed2SolanaSecret(secret);
+        const pKey =
+          secret.length < 64
+            ? floSolana.wif2SolanaSecret(secret)
+            : floSolana.solanaSeed2SolanaSecret(secret);
         const privateKey = floSolana.solanaSecret2UsableInCode(pKey);
         if (!privateKey)
           return notify(`Please enter sender's private key to check balance`);
@@ -1282,7 +1297,7 @@
           html` Loading balance...<sm-spinner></sm-spinner> `
         );
         const promises = [getWalletBalance(address)];
-        const selectedAsset = getRef("asset_selector").value;
+        const selectedAsset = "sol";
         if (selectedAsset !== "sol")
           promises.push(ethOperator.getTokenBalance(address, selectedAsset));
         Promise.all(promises)
@@ -1334,21 +1349,15 @@
           "error-text",
           `Amount should be grater than 0.000001 ${asset.toUpperCase()}`
         );
-        document.querySelectorAll(".asset-symbol").forEach((elem) => {
-          elem.innerHTML = assetIcons[asset];
-        });
-        getRef("send_tx_button").textContent = `Send ${asset.toUpperCase()}`;
       }
       async function sendTx() {
-        const receiverKey = getRef("send_tx_form")
+        const receiver = getRef("send_tx_form")
           .querySelector(".receiver-address")
           .value.trim();
-          const receiver = receiverKey.length <= 44 ? receiverKey: floSolana.wif2SolanaAddress(receiverKey)
-          console.log(receiver)
         const amount = getRef("send_tx_form")
           .querySelector(".receiver-amount")
           .value.trim();
-        const asset = getRef("asset_selector").value;
+        const asset = "sol";
         try {
           const confirmation = await getConfirmation("Send transaction", {
             message: `You are about to send ${amount} ${asset.toUpperCase()} to ${receiver}`,
@@ -1356,10 +1365,14 @@
           });
           buttonLoader("send_tx_button", true);
           if (!confirmation) return;
-          let privateKey = getRef("private_key_input").value.trim();
-          const senderPrivateKeyArray = Uint8Array.from(
-            privateKey.split(" ").map(Number)
-          );
+          const secret = getRef("private_key_input").value.trim();
+          const pKey =
+            secret.length < 64
+              ? floSolana.wif2SolanaSecret(secret)
+              : floSolana.solanaSeed2SolanaSecret(secret);
+          let privateKey = floSolana.solanaSecret2UsableInCode(pKey);
+          console.log("private key", privateKey);
+          const senderPrivateKeyArray = privateKey
           const senderKeypair = solanaWeb3.Keypair.fromSecretKey(
             senderPrivateKeyArray
           );
@@ -1406,6 +1419,7 @@
           getRef("sender_balance_container").classList.add("hidden");
         } catch (e) {
           console.error(e.message);
+          notify(e.message, "error");
           const regex = /\(error=({.*?}),/;
           const match = e.message.match(regex);
           if (match && match[1]) {
@@ -1530,7 +1544,10 @@
           getRef("page_container"),
           html`
             <div class="grid gap-1">
-              <h2>Don't have an Solana Wallet Address or Bitcoin key or Flo key? Create one</h2>
+              <h2>
+                Don't have an Solana address or Bitcoin or Flo private key?
+                Create one
+              </h2>
               <button
                 class="button button--primary interactive gap-0-5 margin-right-auto"
                 onclick=${generateNewID}
@@ -1608,29 +1625,34 @@
             <ul id="generated_addresses" class="grid gap-1-5">
               <li class="grid gap-0-5">
                 <div>
-                  <h5>Solana Wallet key</h5>
-                  <sm-copy value="${solanaKeyPair.publicKey}"></sm-copy>
+                  <h5>Solana seed</h5>
+                  <sm-copy value="${solanaKeyPair.seed}"></sm-copy>
                 </div>
                 <div>
-                  <h5>Solana Wallet seed</h5>
-                  <sm-copy
-                    value="${solanaKeyPair.seed}"
-                  ></sm-copy>
+                  <h5>Solana address</h5>
+                  <sm-copy value="${solanaKeyPair.publicKey}"></sm-copy>
                 </div>
               </li>
               <li class="grid gap-0-5">
                 <div>
-                  <h5>Bitcoin key</h5>
+                  <h5>Bitcoin private key</h5>
                   <sm-copy value="${solanaKeyPair.bitcoinWif}"></sm-copy>
                 </div>
                 <div>
-                  <h5>Flo key</h5>
-                  <sm-copy
-                    value="${solanaKeyPair.floWif}"
-                  ></sm-copy>
+                  <h5>Bitcoin address</h5>
+                  <sm-copy value="${solanaKeyPair.bitcoinAddress}"></sm-copy>
                 </div>
               </li>
-            </ul>
+              <li class="grid gap-0-5">
+                <div>
+                  <h5>Flo private key</h5>
+                  <sm-copy value="${solanaKeyPair.floWif}"></sm-copy>
+                </div>
+                <div>
+                  <h5>Flo address</h5>
+                  <sm-copy value="${solanaKeyPair.floAddress}"></sm-copy>
+                </div>
+              </li>
             </ul>
           `
         );
