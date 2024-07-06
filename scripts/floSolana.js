@@ -161,72 +161,6 @@
     return k2;
   });
 
-  const wif2address = (floSolana.wif2address = function (wif, isFLO = false) {
-    try {
-      // Decode WIF to get the private key
-      const privateKeyHex = coinjs.wif2privkey(wif).privkey;
-      const privateKeyBytes = Crypto.util.hexToBytes(privateKeyHex);
-
-      // Generate public key from the private key
-      const privateKey = new Uint8Array(privateKeyBytes);
-      const keyPair = solanaWeb3.Keypair.fromSeed(privateKey);
-      const publicKey = keyPair.publicKey.toBuffer();
-
-      // Hash the public key (SHA-256 then RIPEMD-160)
-      const sha256Hash = Crypto.SHA256(publicKey);
-      const ripemd160Hash = Crypto.RIPEMD160(
-        Crypto.util.hexToBytes(sha256Hash)
-      );
-
-      // Add network byte (0x00 for Bitcoin, 0x23 for FLO) and compute checksum
-      const networkByte = [isFLO ? 0x23 : 0x00];
-      const networkAndHash = networkByte.concat(
-        Crypto.util.hexToBytes(ripemd160Hash)
-      );
-      const doubleSHA256 = Crypto.SHA256(Crypto.SHA256(networkAndHash));
-      const checksum = doubleSHA256.slice(0, 8);
-
-      // Create the final address
-      const addressBytes = networkAndHash.concat(
-        Crypto.util.hexToBytes(checksum)
-      );
-      const address = bs58.encode(addressBytes);
-
-      return address;
-    } catch (err) {
-      console.error("Error converting WIF to address:", err);
-      return null;
-    }
-  });
-
-  const address2wif = function (address, isFLO = false) {
-    try {
-      // Decode address to get the public key hash
-      const addressBytes = bs58.decode(address);
-      const publicKeyHash = addressBytes.slice(1, -4); // Remove network byte and checksum
-
-      // Generate private key from the public key hash (inverse operation)
-      const privateKey = solanaWeb3.Keypair.fromSeed(publicKeyHash);
-      const privateKeyHex = Crypto.util.bytesToHex(
-        Array.from(privateKey.secretKey).slice(0, 32)
-      );
-
-      // Convert private key to WIF format
-      coinjs.compressed = true;
-      const temp = coinjs.priv;
-      if (isFLO) {
-        coinjs.priv = 0xa3;
-      }
-      const wif = coinjs.privkey2wif(privateKeyHex);
-      coinjs.priv = temp;
-
-      return wif;
-    } catch (err) {
-      console.error("Error converting address to WIF:", err);
-      return null;
-    }
-  };
-
   const solanaSecret2SolanaSeed = (floSolana.solanaSecret2SolanaSeed =
     function (solanaSecret) {
       var p1, p2, k1;
@@ -304,95 +238,6 @@
     return lamports / LAMPORTS_PER_SOL;
   });
 
-  const getAddress = (floSolana.getAddress = function (
-    privateKeyHex,
-    strict = false
-  ) {
-    if (!privateKeyHex) return;
-    var key = new Bitcoin.ECKey(privateKeyHex);
-    if (key.priv == null) return null;
-    key.setCompressed(true);
-    let pubKey = key.getPubKeyHex(),
-      version = bitjs.Base58.decode(privateKeyHex)[0];
-    switch (version) {
-      case coinjs.priv: //BTC
-        return coinjs.bech32Address(pubKey).address;
-      case bitjs.priv: //FLO
-        return bitjs.pubkey2address(pubKey);
-      default:
-        return strict ? false : bitjs.pubkey2address(pubKey); //default to FLO address (if strict=false)
-    }
-  });
-
-  const getPrivateKeyFromAddress = (floSolana.getPrivateKeyFromAddress = function(address, isFLO = false) {
-    try {
-      // Decode the address to get the public key hash
-      const decoded = bs58.decode(address);
-      const publicKeyHash = decoded.slice(1, -4); // Remove network byte and checksum
-  
-      // Create a dummy private key based on the public key hash
-      const dummyPrivateKey = new Uint8Array(32);
-      for (let i = 0; i < publicKeyHash.length && i < 32; i++) {
-        dummyPrivateKey[i] = publicKeyHash[i];
-      }
-      const privateKeyHex = Crypto.util.bytesToHex(Array.from(dummyPrivateKey));
-  
-      // Return the private key in WIF format
-      coinjs.compressed = true;
-      const temp = coinjs.priv;
-      coinjs.priv = isFLO ? 0xa3 : 0x80; // 0x80 for Bitcoin, 0xa3 for FLO
-      const wif = coinjs.privkey2wif(privateKeyHex);
-      coinjs.priv = temp;
-  
-      return wif;
-    } catch (err) {
-      console.error('Error converting address to private key:', err);
-      return null;
-    }
-  })
-
-  const decodeAddress = ( floCrypto.decodeAddress = function (address) {
-    if (!address) return;
-    else if (address.length == 33 || address.length == 34) {
-      //legacy encoding
-      let decode = bitjs.Base58.decode(address);
-      let bytes = decode.slice(0, decode.length - 4);
-      let checksum = decode.slice(decode.length - 4),
-        hash = Crypto.SHA256(
-          Crypto.SHA256(bytes, {
-            asBytes: true,
-          }),
-          {
-            asBytes: true,
-          }
-        );
-      return hash[0] != checksum[0] ||
-        hash[1] != checksum[1] ||
-        hash[2] != checksum[2] ||
-        hash[3] != checksum[3]
-        ? null
-        : {
-            version: bytes.shift(),
-            hex: Crypto.util.bytesToHex(bytes),
-            bytes,
-          };
-    } else if (address.length == 42 || address.length == 62) {
-      //bech encoding
-      let decode = coinjs.bech32_decode(address);
-      if (decode) {
-        let bytes = decode.data;
-        let bech_version = bytes.shift();
-        bytes = coinjs.bech32_convert(bytes, 5, 8, false);
-        return {
-          bech_version,
-          hrp: decode.hrp,
-          hex: Crypto.util.bytesToHex(bytes),
-          bytes,
-        };
-      } else return null;
-    }
-  });
-
   const generateSolanaKeyPair = (floSolana.generateSolanaKeyPair = function () {
     const keyPair = solanaWeb3.Keypair.generate();
     const publicKey = keyPair.publicKey.toBase58();
@@ -405,8 +250,6 @@
     const floWif = floSolana.solanaSeed2wif(seed, true);
     const floAddress = floCrypto.getAddress(floWif);
     const bitcoinAddress = floCrypto.getAddress(bitcoinWif, true);
-    const address = getPrivateKeyFromAddress(bitcoinAddress, false)
-    console.log("floAddress", floAddress, bitcoinAddress, address);
     return { publicKey, seed, bitcoinWif, floWif, floAddress, bitcoinAddress };
   });
 })("object" === typeof module ? module.exports : (window.floSolana = {}));
