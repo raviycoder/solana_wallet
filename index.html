@@ -578,7 +578,7 @@
                 return {
                   isValid: false,
                   errorText:
-                    "Please enter a Solana seed or Bitcoin or Flo private key",
+                    "Please enter a Solana Seed OR Bitcoin Private Key OR FLO Private Key",
                 };
               return {
                 isValid: (() => {
@@ -599,7 +599,7 @@
                     return false;
                   }
                 })(),
-                errorText: `Invalid Solana seed or Bitcoin or Flo private key`,
+                errorText: `Invalid Solana Seed OR Bitcoin Private Key OR FLO Private Key`,
               };
             },
           },
@@ -610,7 +610,7 @@
                 return {
                   isValid: false,
                   errorText:
-                    "Please enter a Solana address  or Bitcoin or Flo private key",
+                    "Please enter a Solana Address OR Bitcoin Private Key OR FLO Private Key",
                 };
               return {
                 isValid: (() => {
@@ -628,7 +628,7 @@
                   }
                 })(),
                 errorText:
-                  "Invalid Solana address or Bitcoin or Flo private key",
+                  "Invalid Solana Address OR Bitcoin Private Key OR FLO Private Key",
               };
             },
           },
@@ -777,7 +777,7 @@
                   <sm-input
                     id="wallet_address_input"
                     class="password-field flex-1"
-                    placeholder="Solana address or Bitcoin or Flo private key"
+                    placeholder="Solana Address OR Bitcoin Private Key OR FLO Private Key"
                     type="password"
                     animate
                     required
@@ -864,12 +864,6 @@
           renderError("Please switch MetaMask to Ethereum Mainnet");
         }
         renderSearchedAddressList();
-
-        document
-          .getElementById("check_balance_button")
-          .addEventListener("click", async () => {
-            await checkBalance();
-          });
       }
 
       function renderError(title, description) {
@@ -1134,7 +1128,7 @@
                 </div>
                 <sm-input
                   id="private_key_input"
-                  placeholder="Sender's Solana seed or Bitcoin or Flo private key"
+                  placeholder="Sender's Solana Seed OR Bitcoin Private Key OR FLO Private Key"
                   oninput=${handleSenderInput}
                   data-private-key
                   class="password-field"
@@ -1545,7 +1539,7 @@
           html`
             <div class="grid gap-1">
               <h2>
-                Don't have an Solana address or Bitcoin or Flo private key?
+                Don't have an Solana Address OR Bitcoin Private Key OR FLO Private Key?
                 Create one
               </h2>
               <button
@@ -1625,31 +1619,31 @@
             <ul id="generated_addresses" class="grid gap-1-5">
               <li class="grid gap-0-5">
                 <div>
-                  <h5>Solana seed</h5>
+                  <h5>Solana Seed</h5>
                   <sm-copy value="${solanaKeyPair.seed}"></sm-copy>
                 </div>
                 <div>
-                  <h5>Solana address</h5>
+                  <h5>Solana Address</h5>
                   <sm-copy value="${solanaKeyPair.publicKey}"></sm-copy>
                 </div>
               </li>
               <li class="grid gap-0-5">
                 <div>
-                  <h5>Bitcoin private key</h5>
+                  <h5>Bitcoin Private Key</h5>
                   <sm-copy value="${solanaKeyPair.bitcoinWif}"></sm-copy>
                 </div>
                 <div>
-                  <h5>Bitcoin address</h5>
+                  <h5>Bitcoin Address</h5>
                   <sm-copy value="${solanaKeyPair.bitcoinAddress}"></sm-copy>
                 </div>
               </li>
               <li class="grid gap-0-5">
                 <div>
-                  <h5>Flo private key</h5>
+                  <h5>Flo Private Key</h5>
                   <sm-copy value="${solanaKeyPair.floWif}"></sm-copy>
                 </div>
                 <div>
-                  <h5>Flo address</h5>
+                  <h5>Flo Address</h5>
                   <sm-copy value="${solanaKeyPair.floAddress}"></sm-copy>
                 </div>
               </li>
