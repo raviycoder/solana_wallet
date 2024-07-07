@@ -277,6 +277,11 @@ ul {
 .uppercase {
   text-transform: uppercase;
 }
+.create-buttons{
+  display: flex;
+  max-width: 400px;
+  gap: 1rem;
+}
 .capitalize {
   text-transform: capitalize;
 }
@@ -945,6 +950,9 @@ aside h4 {
   #page_container[data-page="home"] > :first-child {
     order: 1;
   }
+  .create-buttons{
+    display: grid;
+  }
 }
 @media only screen and (min-width: 640px) {
   sm-popup {
@@ -953,6 +961,7 @@ aside h4 {
   .popup__header {
     padding: 1rem 1.5rem 0 1.5rem;
   }
+  
   main {
     grid-template-columns: 10rem 1fr;
     grid-template-areas: "header header" "navbar pages";
