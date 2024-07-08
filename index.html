@@ -410,9 +410,9 @@
       document.addEventListener("popupclosed", (e) => {
         zIndex--;
         switch (e.target.id) {
-          case 'retrieve_btc_addr_popup':
-                    getRef('recovered_btc_addr_wrapper').classList.add('hidden')
-                    break;
+          case "retrieve_btc_addr_popup":
+            getRef("recovered_btc_addr_wrapper").classList.add("hidden");
+            break;
         }
       });
       //Function for displaying toast notifications. pass in error for mode param if you want to show an error.
@@ -704,8 +704,7 @@
               if (!value)
                 return {
                   isValid: false,
-                  errorText:
-                    "Please enter a Solana Seed",
+                  errorText: "Please enter a Solana Seed",
                 };
               return {
                 isValid: (() => {
@@ -1470,91 +1469,91 @@
         );
       }
       async function sendTx() {
-        const receiver = getRef("send_tx_form")
-          .querySelector(".receiver-address")
-          .value.trim();
-        const amount = getRef("send_tx_form")
-          .querySelector(".receiver-amount")
-          .value.trim();
-        const asset = "sol";
-        try {
-          const confirmation = await getConfirmation("Send transaction", {
-            message: `You are about to send ${amount} ${asset.toUpperCase()} to ${receiver}`,
-            confirmText: "Send",
-          });
-          buttonLoader("send_tx_button", true);
-          if (!confirmation) return;
-          const secret = getRef("private_key_input").value.trim();
-          const pKey =
-            secret.length < 64
-              ? floSolana.wif2SolanaSecret(secret)
-              : floSolana.solanaSeed2SolanaSecret(secret);
-          let privateKey = floSolana.solanaSecret2UsableInCode(pKey);
-          console.log("private key", privateKey);
-          const senderPrivateKeyArray = privateKey;
-          const senderKeypair = solanaWeb3.Keypair.fromSecretKey(
-            senderPrivateKeyArray
-          );
-          if (/^[0-9a-fA-F]{64}$/.test(privateKey)) {
-            privateKey = coinjs.privkey2wif(privateKey);
-          }
-          privateKey = coinjs.wif2privkey(privateKey).privkey;
-          switch (asset) {
-            case "sol": {
-              const receiverPublicKey = new solanaWeb3.PublicKey(receiver);
-              console.log("reciver", receiverPublicKey);
-              const transaction = new solanaWeb3.Transaction().add(
-                solanaWeb3.SystemProgram.transfer({
-                  fromPubkey: senderKeypair.publicKey,
-                  toPubkey: receiverPublicKey,
-                  lamports: amount * solanaWeb3.LAMPORTS_PER_SOL, // Convert SOL to lamports
-                })
-              );
-              const signature = await solanaWeb3.sendAndConfirmTransaction(
-                getWalletBalance.connection,
-                transaction,
-                [senderKeypair]
-              );
-              showTransactionResult("pending", { txHash: signature });
-              await signature.wait();
-              showTransactionResult("confirmed", { txHash: signature });
-              break;
-            }
-            case "usdc":
-            case "usdt": {
-              const tx = await ethOperator.sendToken({
-                privateKey,
-                receiver,
-                amount,
-                token: asset,
-              });
-              showTransactionResult("pending", { txHash: tx.hash });
-              await tx.wait();
-              showTransactionResult("confirmed", { txHash: tx.hash });
-              break;
-            }
-          }
-          getRef("send_tx_form").reset();
-          getRef("sender_balance_container").classList.add("hidden");
-        } catch (e) {
-          console.error(e.message);
-          notify(e.message, "error");
-          const regex = /\(error=({.*?}),/;
-          const match = e.message.match(regex);
-          if (match && match[1]) {
-            const { code } = JSON.parse(match[1]);
-            if (code === -32000)
-              showTransactionResult("failed", {
-                description: `Insufficient ${asset.toUpperCase()} balance`,
-              });
-            else {
-              showTransactionResult("failed", { description: e.message });
-            }
-          }
-        } finally {
-          buttonLoader("send_tx_button", false);
-        }
-      }
+  const receiver = getRef("send_tx_form")
+    .querySelector(".receiver-address")
+    .value.trim();
+  const amount = parseFloat(
+    getRef("send_tx_form")
+      .querySelector(".receiver-amount")
+      .value.trim()
+  );
+  const asset = "sol";
+  try {
+    const confirmation = await getConfirmation("Send transaction", {
+      message: `You are about to send ${amount} ${asset.toUpperCase()} to ${receiver}`,
+      confirmText: "Send",
+    });
+    buttonLoader("send_tx_button", true);
+    if (!confirmation) return;
+
+    const secret = getRef("private_key_input").value.trim();
+    const pKey =
+      secret.length < 64
+        ? floSolana.wif2SolanaSecret(secret)
+        : floSolana.solanaSeed2SolanaSecret(secret);
+    let privateKey = floSolana.solanaSecret2UsableInCode(pKey);
+
+    console.log("private key", privateKey);
+    const senderKeypair = solanaWeb3.Keypair.fromSecretKey(
+      privateKey
+    );
+
+    // if (/^[0-9a-fA-F]{64}$/.test(privateKey)) {
+    //   privateKey = coinjs.privkey2wif(privateKey);
+    // }
+    // privateKey = coinjs.wif2privkey(privateKey).privkey;
+
+    const receiverPublicKey = new solanaWeb3.PublicKey(receiver);
+    console.log("receiver", receiverPublicKey);
+    const transaction = new solanaWeb3.Transaction().add(
+      solanaWeb3.SystemProgram.transfer({
+        fromPubkey: senderKeypair.publicKey,
+        toPubkey: receiverPublicKey,
+        lamports: amount * solanaWeb3.LAMPORTS_PER_SOL, // Convert SOL to lamports
+      })
+    );
+    const signature = await solanaWeb3.sendAndConfirmTransaction(
+      getWalletBalance.connection,
+      transaction,
+      [senderKeypair]
+    );
+    showTransactionResult("pending", { txHash: signature });
+    await signature.wait();
+    showTransactionResult("confirmed", { txHash: signature });
+
+    getRef("send_tx_form").reset();
+    getRef("sender_balance_container").classList.add("hidden");
+
+    const addressOfKey = floSolana.solanaSeed2SolanaAddress(secret);
+    const balance = await walletBalance(addressOfKey);
+    console.log("balance", balance);
+  } catch (e) {
+    console.error(e.message);
+    notify(e, "error");
+    showTransactionResult("failed", { description: e.message });
+    // if (e.message) {
+    //   const regex = /\(error=({.*?}),/;
+    //   const match = e.message.match(regex);
+    //   if (match && match[1]) {
+    //     const { code } = JSON.parse(match[1]);
+    //     if (code === -32000) {
+    //       showTransactionResult("failed", {
+    //         description: `Insufficient ${asset.toUpperCase()} balance`,
+    //       });
+    //     } else {
+    //       showTransactionResult("failed", { description: e.message });
+    //     }
+    //   } else {
+    //     showTransactionResult("failed", { description: e.message });
+    //   }
+    // } else {
+    //   showTransactionResult("failed", { description: e.message });
+    // }
+  } finally {
+    buttonLoader("send_tx_button", false);
+  }
+}
+
       function showTransactionResult(status, { txHash, description = "" }) {
         switch (status) {
           case "pending":
@@ -1758,18 +1757,18 @@
         return uint8Array;
       }
       function retrieveSolanaAddr() {
-            function retrieve() {
-                let seed = getRef('retrieve_btc_addr_field').value.trim();
-                getRef('recovered_btc_addr_wrapper').classList.remove('hidden')
-                getRef('recovered_btc_addr').value = floSolana.solanaSeed2SolanaAddress(seed);
-            }
-            if (document.startViewTransition) {
-                document.startViewTransition(() => {
-                    retrieve()
-                })
-            } else
-                retrieve()
+        function retrieve() {
+          let seed = getRef("retrieve_btc_addr_field").value.trim();
+          getRef("recovered_btc_addr_wrapper").classList.remove("hidden");
+          getRef("recovered_btc_addr").value =
+            floSolana.solanaSeed2SolanaAddress(seed);
         }
+        if (document.startViewTransition) {
+          document.startViewTransition(() => {
+            retrieve();
+          });
+        } else retrieve();
+      }
 
       function generateNewID() {
         const solanaKeyPair = floSolana.generateSolanaKeyPair();
