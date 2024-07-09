@@ -1060,15 +1060,19 @@
             for (const keys in solanaContacts) {
               const walletAddress = solanaContacts[keys].walletAddress;
               const isFloAddr = solanaContacts[keys].isfloaddr;
+              const isBTC = isFloAddr.startsWith("bc") ? "BTC":"FLO"
               console.log("isfloaddr", isFloAddr);
               renderedContacts.push(html`<li
                 class="contact"
                 .dataset=${{ address: walletAddress }}
               >
-                <sm-copy value="${walletAddress}"></sm-copy>
                 ${!isFloAddr
-                  ? null
-                  : html`<sm-copy value="${isFloAddr}"></sm-copy>`}
+                  ? html `<sm-copy value="${walletAddress}"></sm-copy>`
+                  : html`<sm-chips onchange=${e => e.target.closest('.contact').querySelector('sm-copy').value = e.target.value}>
+                                    <sm-chip value=${walletAddress} selected>SOL</sm-chip>
+                                    <sm-chip value=${isFloAddr}>${isBTC}</sm-chip>
+                                </sm-chips>
+                  <sm-copy value="${walletAddress}"></sm-copy>`}
                 <div class="flex align-center space-between gap-0-5">
                   <button
                     class="button button--small"
