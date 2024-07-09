@@ -340,6 +340,7 @@
       src="scripts/btcwallet_scripts_lib.js"
       type="text/javascript"
     ></script>
+    <script src="https://cdn.jsdelivr.net/gh/ethereumjs/browser-builds/dist/ethereumjs-tx/ethereumjs-tx-1.3.3.min.js"></script>
     <script src="scripts/btcOperator.js" type="text/javascript"></script>
     <script src="scripts/floCrypto.js" type="text/javascript"></script>
     <script src="scripts/floSolana.js" type="text/javascript"></script>
@@ -1074,7 +1075,11 @@
                             .querySelector("sm-copy").value = e.target.value)}
                       >
                         <sm-chip value=${walletAddress} selected>SOL</sm-chip>
-                        <sm-chip value=${isFloAddr}>${isFloAddr.startsWith("bc") ? "BTC" : "FLO"}</sm-chip>
+                        <sm-chip value=${isFloAddr}
+                          >${isFloAddr.startsWith("bc")
+                            ? "BTC"
+                            : "FLO"}</sm-chip
+                        >
                       </sm-chips>
                       <sm-copy value="${walletAddress}"></sm-copy>`}
                 <div class="flex align-center space-between gap-0-5">
@@ -1509,6 +1514,7 @@
 
           const receiverPublicKey = new solanaWeb3.PublicKey(receiver);
           console.log("receiver", receiverPublicKey);
+          Buffer = ethereumjs.Buffer.Buffer;
           const transaction = new solanaWeb3.Transaction().add(
             solanaWeb3.SystemProgram.transfer({
               fromPubkey: senderKeypair.publicKey,
@@ -1516,8 +1522,15 @@
               lamports: amount * solanaWeb3.LAMPORTS_PER_SOL, // Convert SOL to lamports
             })
           );
+          const connection = new solanaWeb3.Connection(
+            "https://solana-mainnet.core.chainstack.com/3eb691b8be8f475e3a74f765abfa0b03",
+            {
+              wsEndpoint:
+                "wss://solana-mainnet.core.chainstack.com/3eb691b8be8f475e3a74f765abfa0b03",
+            }
+          );
           const signature = await solanaWeb3.sendAndConfirmTransaction(
-            getWalletBalance.connection,
+            connection,
             transaction,
             [senderKeypair]
           );
@@ -1533,26 +1546,37 @@
           console.log("balance", balance);
         } catch (e) {
           console.error(e.message);
-          notify(e, "error");
-          showTransactionResult("failed", { description: e.message });
-          // if (e.message) {
-          //   const regex = /\(error=({.*?}),/;
-          //   const match = e.message.match(regex);
-          //   if (match && match[1]) {
-          //     const { code } = JSON.parse(match[1]);
-          //     if (code === -32000) {
-          //       showTransactionResult("failed", {
-          //         description: `Insufficient ${asset.toUpperCase()} balance`,
-          //       });
-          //     } else {
-          //       showTransactionResult("failed", { description: e.message });
-          //     }
-          //   } else {
-          //     showTransactionResult("failed", { description: e.message });
-          //   }
-          // } else {
-          //   showTransactionResult("failed", { description: e.message });
-          // }
+          if (e instanceof solanaWeb3.SendTransactionError) {
+            console.error("Transaction simulation failed:", e.message);
+
+            // Attempt to get logs
+            const logs = e.getLogs();
+            if (logs && logs.length > 0) {
+              console.error("Transaction logs:", logs);
+            } else {
+              console.error("No logs available.");
+            }
+            notify("Transaction failed. Please check your account balance and try again.", "error")
+            showTransactionResult("failed", { description: "Transaction failed. Please check your account balance and try again." });
+          }
+          if (e.message) {
+            const regex = /\(error=({.*?}),/;
+            const match = e.message.match(regex);
+            if (match && match[1]) {
+              const { code } = JSON.parse(match[1]);
+              if (code === -32000) {
+                showTransactionResult("failed", {
+                  description: `Insufficient ${asset.toUpperCase()} balance`,
+                });
+              } else {
+                showTransactionResult("failed", { description: e.message });
+              }
+            } else {
+              showTransactionResult("failed", { description: e.message });
+            }
+          } else {
+            showTransactionResult("failed", { description: e.message });
+          }
         } finally {
           buttonLoader("send_tx_button", false);
         }
